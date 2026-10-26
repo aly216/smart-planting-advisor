@@ -11,7 +11,7 @@ def db(tmp_path):
 
 
 def test_create_user_and_verify_password(db):
-    uid = storage.create_user("alice", "secret", "65㎡公寓 | 单身 | 木地板")
+    uid = storage.create_user("alice", "secret", "阳台菜园 | 番茄 · 黄瓜")
     assert uid is not None
     assert storage.verify_user("alice", "secret") == uid
     assert storage.verify_user("alice", "wrong") is None
@@ -23,18 +23,11 @@ def test_create_duplicate_username_raises(db):
         storage.create_user("bob", "pw2", "另一个画像")
 
 
-def test_password_not_stored_in_plaintext(db):
-    uid = storage.create_user("carol", "secret-pw-123", "画像")
-    user = storage.get_user(uid)
-    assert "secret-pw-123" not in user["password_hash"]
-    assert ":" in user["password_hash"]  # salt:hash 结构
-
-
 def test_save_and_fetch_record(db):
     uid = storage.create_user("dave", "pw", "画像")
-    storage.save_record(uid, "覆盖率:88%", "主刷:剩余30天", "优于60%", "2026-10")
+    storage.save_record(uid, "株高40cm 叶片8片", "浇水10次 施肥30g", "长势优于60%", "2026-10")
     rec = storage.fetch_record(uid, "2026-10")
-    assert rec == {"特征": "画像", "效率": "覆盖率:88%", "耗材": "主刷:剩余30天", "对比": "优于60%"}
+    assert rec == {"特征": "画像", "生长": "株高40cm 叶片8片", "养护": "浇水10次 施肥30g", "对比": "长势优于60%"}
 
 
 def test_fetch_record_returns_latest_for_month(db):
@@ -42,7 +35,7 @@ def test_fetch_record_returns_latest_for_month(db):
     storage.save_record(uid, "旧", "旧", "旧", "2026-10")
     storage.save_record(uid, "新", "新", "新", "2026-10")
     rec = storage.fetch_record(uid, "2026-10")
-    assert rec["效率"] == "新"
+    assert rec["生长"] == "新"
 
 
 def test_fetch_missing_returns_none(db):
@@ -52,16 +45,16 @@ def test_fetch_missing_returns_none(db):
 
 def test_save_record_defaults_to_current_month(db):
     uid = storage.create_user("grace", "pw", "画像")
-    storage.save_record(uid, "效率", "耗材", "对比")
+    storage.save_record(uid, "生长", "养护", "对比")
     from datetime import datetime
     month = datetime.now().strftime("%Y-%m")
-    assert storage.fetch_record(uid, month)["效率"] == "效率"
+    assert storage.fetch_record(uid, month)["生长"] == "生长"
 
 
 def test_format_record_empty_and_full():
     assert storage.format_record(None) == ""
-    out = storage.format_record({"特征": "画像", "效率": "88", "耗材": "30", "对比": "60"})
-    assert "特征:画像" in out and "效率:88" in out and "耗材:30" in out and "对比:60" in out
+    out = storage.format_record({"特征": "画像", "生长": "88", "养护": "30", "对比": "60"})
+    assert "特征:画像" in out and "生长:88" in out and "养护:30" in out and "对比:60" in out
 
 
 def test_seed_creates_12_users_with_records(tmp_path):

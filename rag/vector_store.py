@@ -76,7 +76,11 @@ class VectorStoreService:
                     logger.warning(f'文件加载失败: {path} - 无内容')
                     continue
 
-                self.vector_store.add_documents(split_documents)
+                # ChromaDB 单次 upsert 有最大 batch 上限（5461 条），大文件需分批写入
+                batch_size = 2000
+                for i in range(0, len(split_documents), batch_size):
+                    self.vector_store.add_documents(split_documents[i:i + batch_size])
+
                 save_md5_hex(md5_hex)
                 logger.info(f'文件加载成功: {path}')
             except Exception as e:

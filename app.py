@@ -6,7 +6,7 @@ from utils import storage
 storage.init_db()
 
 # 标题
-st.title("智扫通机器人智能客服")
+st.title("智慧种植智能顾问")
 st.divider()
 
 if "logged_in" not in st.session_state:
@@ -29,7 +29,7 @@ with st.sidebar:
         username = st.text_input("用户名")
         password = st.text_input("密码", type="password")
         if mode == "注册":
-            profile = st.text_input("画像（如：65㎡公寓 | 单身 | 木地板）")
+            profile = st.text_input("画像（如：阳台菜园 | 番茄 · 黄瓜）")
             if st.button("注册并登录"):
                 if not username or not password:
                     st.warning("用户名和密码不能为空")

@@ -31,9 +31,9 @@ def test_get_current_month_returns_current_month():
 
 def test_fetch_external_data_returns_formatted(db):
     uid = storage.create_user("user1", "pw", "画像")
-    storage.save_record(uid, "覆盖率:88%", "主刷:30天", "优于60%", "2026-10")
+    storage.save_record(uid, "株高40cm 叶片8片", "浇水10次", "长势优于60%", "2026-10")
     out = at.fetch_external_data.func(uid, "2026-10")
-    assert "特征:画像" in out and "覆盖率:88%" in out
+    assert "特征:画像" in out and "株高40cm" in out
 
 
 def test_fetch_external_data_empty_when_missing(db):
@@ -46,6 +46,6 @@ def test_save_record_requires_login(db):
 
 def test_save_record_writes_and_confirms(db):
     uid = storage.create_user("user2", "pw", "画像")
-    msg = at.save_record.func("覆盖率:88%", "主刷:30天", "优于60%", "2026-10", RuntimeStub({"user_id": uid}))
+    msg = at.save_record.func("株高40cm 叶片8片", "浇水10次", "长势优于60%", "2026-10", RuntimeStub({"user_id": uid}))
     assert "已保存" in msg
-    assert storage.fetch_record(uid, "2026-10")["效率"] == "覆盖率:88%"
+    assert storage.fetch_record(uid, "2026-10")["生长"] == "株高40cm 叶片8片"
